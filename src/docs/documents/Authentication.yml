@@ -1,0 +1,155 @@
+/register:
+  post:
+    tags:
+      - Authentication
+    summary: Register New Account
+    description: Use For Register New Account
+    requestBody:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            required:
+              - username
+              - email
+              - password
+            properties:
+              username:
+                type: string
+                examples: alen1945
+              email:
+                type: string
+                examples: mysecretpassword
+              password:
+                type: string
+                examples: mysecretpassword
+    responses:
+      201:
+        description: Create Success
+      202:
+        description: Request Accepted  but the processing has not been completed
+      400:
+        description: Error
+      500:
+        description: Internal Server Error
+
+/verify:
+  get:
+    tags:
+      - Authentication
+    summary: Verify New Account
+    description: Use To Verify New Account
+    parameters:
+      - in : query
+        required: true
+        name: code
+        type: string
+        description: Code to Verify Account
+    responses:
+      200:
+        description: Success
+      202:
+        description: Request Accepted  but the processing has not been completed
+      400:
+        description: Error
+      500:
+        description: Internal Server Error
+        
+/login:
+  post:
+    tags:
+      - Authentication
+    summary: Login to Account
+    description: Login to Account
+    requestBody:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            require:
+              - username
+              - password
+            properties:
+              username:
+                type: string
+                examples: alen1945
+              password:
+                type: string
+                examples: mysecretpassword
+    responses:
+      200:
+        description: Success
+      202:
+        description: Request Accepted  but the processing has not been completed
+      400:
+        description: Error
+      500:
+        description: Internal Server Error
+
+/forgot-password:
+  post:
+    tags:
+      - Authentication
+    summary: Forgot Password
+    description: Use When Your Forgot Password
+    requestBody:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            require:
+              - username
+            properties:
+              username:
+                type: string
+                examples: alen1945
+    responses:
+      200:
+        description: Success
+      202:
+        description: Request Accepted  but the processing has not been completed
+      400:
+        description: Error
+      500:
+        description: Internal Server Error
+
+/change-password:
+  post:
+    tags:
+      - Authentication
+    summary: Change Forgot Password
+    description: Use After Your Get Code Verify To Change Forgot Password
+    parameters:
+      - in : query
+        required: true
+        name: code
+        type: string
+        description: Code verify to change password
+    requestBody:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            require:
+              - new_password
+              - confirm_password
+            properties:
+              new_password:
+                type: string
+                examples: mychangepassword
+              confirm_password:
+                type: string
+                examples: mychangepassword
+    responses:
+      200:
+        description: Success
+      202:
+        description: Request Accepted  but the processing has not been completed
+      400:
+        description: Error
+      500:
+        description: Internal Server Error

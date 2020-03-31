@@ -1,0 +1,41 @@
+{
+  "name": "be-project-fintech",
+  "version": "1.0.0",
+  "description": "api for app fintech",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alen1945/be-project-fintech.git"
+  },
+  "keywords": [
+    "api",
+    "fintech",
+    "quick cash"
+  ],
+  "author": "Alen1945",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Alen1945/be-project-fintech/issues"
+  },
+  "homepage": "https://github.com/Alen1945/be-project-fintech#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "http-errors": "^1.7.3",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.2",
+    "nodemailer": "^6.4.6",
+    "qs": "^6.9.3",
+    "sequelize": "^5.21.5",
+    "swagger-ui-express": "^4.1.4",
+    "uuid": "^7.0.2",
+    "yamljs": "^0.3.0"
+  }
+}
