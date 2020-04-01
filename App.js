@@ -4,8 +4,12 @@ const createError = require('http-errors')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 
-// Routes
+/* Routes */
 const { RegisterUsers, Verify, LoginUser, ForgotPassword } = require('./src/controllers/users')
+
+/* Auth Middleware */
+const autMiddleware = require('./src/middleware/authMiddleware')
+
 App.use(morgan('tiny'))
 App.use(bodyParser.urlencoded({ extended: false }))
 App.use(bodyParser.json())
