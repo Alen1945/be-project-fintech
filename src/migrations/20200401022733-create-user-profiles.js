@@ -1,35 +1,39 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('users', {
+    return queryInterface.createTable('user_profiles', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER(11)
+        type: Sequelize.INTEGER
       },
-      id_role: {
+      id_user: {
         type: Sequelize.INTEGER(11),
-        defaultValue: 1,
         allowNull: false,
         references: {
-          model: 'role_users',
+          model: 'users',
           key: 'id'
         },
         onUpdate: 'CASCADE',
-        onDelete: 'NO ACTION',
+        onDelete: 'CASCADE',
       },
-      username: {
-        type: Sequelize.STRING(40),
-        allowNull: false
+      fullname: {
+        type: Sequelize.STRING
       },
-      password: {
+      email: {
         type: Sequelize.STRING(100),
-        allowNull: false
+        allowNull: false,
       },
-      status: {
-        type: Sequelize.TINYINT(1),
-        defaultValue: 0
+      gender: {
+        type: Sequelize.ENUM(['male', 'female', 'others']),
+        defaultValue: 'others'
+      },
+      picture: {
+        type: Sequelize.TEXT,
+      },
+      address: {
+        type: Sequelize.TEXT,
       },
       isDelete: {
         type: Sequelize.TINYINT(1),
@@ -37,17 +41,15 @@ module.exports = {
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+        type: Sequelize.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')
+        type: Sequelize.DATE
       }
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('users');
+    return queryInterface.dropTable('user_profiles');
   }
 };

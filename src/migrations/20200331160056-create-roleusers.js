@@ -12,16 +12,16 @@ module.exports = {
         type: Sequelize.STRING(40),
         allowNull: false
       },
-      is_delete: {
+      isDelete: {
         type: Sequelize.TINYINT(1),
         defaultValue: 0
       },
-      created_at: {
+      createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
-      updated_at: {
+      updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')
