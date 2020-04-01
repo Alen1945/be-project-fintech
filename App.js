@@ -5,7 +5,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 
 /* Routes */
-const { RegisterUsers, Verify, LoginUser, ForgotPassword } = require('./src/controllers/users')
+const { RegisterUsers, Verify, LoginUser, ForgotPassword, GetProfile } = require('./src/controllers/users')
 
 /* Auth Middleware */
 const autMiddleware = require('./src/middleware/authMiddleware')
@@ -27,6 +27,10 @@ App.get('/verify', Verify)
 App.post('/login', LoginUser)
 App.post('/forgot-password', ForgotPassword)
 App.post('/change-password', ForgotPassword)
+
+
+App.get('/profile', autMiddleware, GetProfile)
+
 
 //Not Found
 App.use((req, res, next) => {
