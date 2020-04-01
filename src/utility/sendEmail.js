@@ -11,10 +11,10 @@ const transporter = nodeMailer.createTransport({
 const mailOptions = (to, codeVerify) => ({
   from: process.env.USER_EMAIL,
   to: to,
-  subject: 'Verify Your Account',
+  subject: 'Code Verify',
   html: `
    <h2>Hai</h2>
-   <h3>This is Code to Verify Your Account</h3>
+   <h3>This is Code Your Code Verify</h3>
    <strong>${codeVerify}</strong>
   `
 })
