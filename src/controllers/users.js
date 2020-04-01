@@ -42,3 +42,27 @@ exports.RegisterUsers = async (req, res, next) => {
     })
   }
 }
+
+exports.Verify = async (req, res, next) => {
+  try {
+    if (!req.query.code) {
+      throw new Error('Required Code Verification')
+    }
+    const verify = await Profile.findOne({ where: { code_verify: req.query.code } })
+    if (!verify) {
+      throw new Error('Failed to Verify Your Account')
+    }
+    await Profile.update({ code_verify: null }, { where: { code_verify: req.query.code } })
+    await Users.update({ status: 1 }, { where: { id: verify.id_user } })
+    res.status(200).send({
+      success: true,
+      msg: 'Your Account Is Verify Please Login'
+    })
+  } catch (e) {
+    console.log(e)
+    res.status(202).send({
+      success: false,
+      msg: e.message
+    })
+  }
+}
