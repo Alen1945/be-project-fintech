@@ -186,10 +186,14 @@ exports.ForgotPassword = async (req, res, next) => {
       if (req.body.new_password !== req.body.confirm_password) {
         throw new Error("Confirm Password not Match");
       }
-      const idUser = await Profile.findOne({
+      const dataUser = await Profile.findOne({
         where: { code_verify: req.query.code },
         attributes: ["id_user"]
-      }).get("id_user");
+      });
+      if (!dataUser) {
+        throw new Error("Wrong Code Verification");
+      }
+      const idUser = dataUser.get("id_user");
       const updatePassword = await Users.update(
         { password: bcrypt.hashSync(req.body.new_password) },
         {
