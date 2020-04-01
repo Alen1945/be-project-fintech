@@ -23,7 +23,10 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING(100),
-        allowNull: false,
+        allowNull: true,
+      },
+      code_verify: {
+        type: Sequelize.STRING(60),
       },
       gender: {
         type: Sequelize.ENUM(['male', 'female', 'others']),
