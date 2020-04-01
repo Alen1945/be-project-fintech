@@ -5,7 +5,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 
 // Routes
-const { RegisterUsers, Verify } = require('./src/controllers/users')
+const { RegisterUsers, Verify, LoginUser } = require('./src/controllers/users')
 App.use(morgan('tiny'))
 App.use(bodyParser.urlencoded({ extended: false }))
 App.use(bodyParser.json())
@@ -20,6 +20,7 @@ App.use('/api-docs', require('./src/docs/'))
 
 App.post('/register', RegisterUsers)
 App.get('/verify', Verify)
+App.post('/login', LoginUser)
 //Not Found
 App.use((req, res, next) => {
   next(createError(404))
