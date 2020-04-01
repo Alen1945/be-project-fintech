@@ -1,4 +1,4 @@
 
 module.exports = {
-  User: ['Authentication.yml'],
+  User: ['Authentication.yml', 'UserProfile.yml'],
 }

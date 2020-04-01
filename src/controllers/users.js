@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs')
 const validator = require('validator')
 const jwt = require('jsonwebtoken')
-const { users: Users, user_profiles: Profile, role_users: Role } = require('../models')
+const { users: Users, user_profiles: Profile, role_users: Role, user_balances: Balance } = require('../models')
 const verifyCode = require('../utility/generateCodeVerify')
 const sendEmail = require('../utility/sendEmail')
 exports.RegisterUsers = async (req, res, next) => {
@@ -20,9 +20,13 @@ exports.RegisterUsers = async (req, res, next) => {
     const hashPassword = bcrypt.hashSync(password)
     const resultUsers = Users.build({ username, password: hashPassword })
     const resultProfile = Profile.build({ email, code_verify: await verifyCode() })
+    const resultBalance = Balance.build()
     await resultUsers.save()
     await resultProfile.setUser(resultUsers)
+    await resultBalance.setUser(resultUsers)
     await resultProfile.save()
+    await resultBalance.save()
+
     if (resultProfile) {
       await sendEmail(email, resultProfile.get('code_verify'))
       res.status(201).send({
@@ -79,6 +83,7 @@ exports.LoginUser = async (req, res, next) => {
     const dataUser = await Users.findOne({
       where: { username }, include: [
         { model: Role, attributes: ['name'] },
+        { model: Balance, attributes: ['balance'] },
         { model: Profile, attributes: ['fullname', 'email', 'gender', 'picture', 'address'] }]
     })
     if (!dataUser || !bcrypt.compareSync(password, dataUser.password)) {
@@ -96,6 +101,8 @@ exports.LoginUser = async (req, res, next) => {
         dataProfile: {
           id: dataUser.id,
           username,
+          role: dataUser.role_user.name,
+          balance: dataUser.user_balance.balance,
           ...dataUser.user_profile.dataValues
         }
       }
@@ -151,13 +158,84 @@ exports.ForgotPassword = async (req, res, next) => {
           id: parseInt(idUser)
         }
       })
-      if (!updatePassword[0]) {
+      const setCodeToNull = await Profile.update({ code_verify: null }, {
+        where: {
+          id_user: parseInt(idUser)
+        }
+      })
+      if (!updatePassword[0] || !setCodeToNull[0]) {
         throw new Error('Failed To Change Password')
       }
       return res.status(200).send({
         success: true,
         msg: 'Success Change Password, Please Login'
       })
+    }
+  } catch (e) {
+    console.log(e)
+    res.status(202).send({
+      success: false,
+      msg: e.message
+    })
+  }
+}
+
+exports.GetProfile = async (req, res, next) => {
+  try {
+    const dataUser = await Users.findOne({
+      where: { id: req.auth.id }, include: [
+        { model: Role, attributes: ['name'] },
+        { model: Balance, attributes: ['balance'] },
+        { model: Profile, attributes: ['fullname', 'email', 'gender', 'picture', 'address'] }]
+    })
+    if (!dataUser) {
+      throw new Error('Your Account Has Not Exist Anymore')
+    }
+    return res.status(200).send({
+      success: true,
+      data: {
+        id: dataUser.id,
+        username: dataUser.username,
+        balance: dataUser.user_balance.balance,
+        role: dataUser.role_user.name,
+        ...dataUser.user_profile.dataValues
+      }
+    })
+  } catch (e) {
+    res.status(202).send({
+      success: false,
+      msg: e.message
+    })
+  }
+}
+
+
+exports.TopUp = async (req, res, next) => {
+  try {
+    if (!req.body.nominal_topup) {
+      throw new Error('Please Entry nominal_topup')
+    }
+    if (req.body.nominal_topup <= 0) {
+      throw new Error('Nominal Top Up Must Positif Integer')
+    }
+    const dataUser = await Users.findOne({
+      where: { id: req.auth.id }, include: [
+        { model: Balance, attributes: ['balance'] },
+      ]
+    })
+    if (!dataUser) {
+      throw new Error('Your Account Has Not Exist Anymore')
+    }
+    const updateBalance = await Balance.update(
+      { balance: parseFloat(dataUser.user_balance.balance) + parseFloat(req.body.nominal_topup) },
+      { where: { id_user: req.auth.id } })
+    if (updateBalance[0]) {
+      res.send({
+        success: true,
+        msg: `Success TopUp for ${req.auth.username}`
+      })
+    } else {
+      throw new Error('Failed to TopUp!')
     }
   } catch (e) {
     console.log(e)
