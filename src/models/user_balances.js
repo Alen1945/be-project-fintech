@@ -2,7 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
   const user_balances = sequelize.define('user_balances', {
     id_user: DataTypes.INTEGER,
-    balance: DataTypes.INTEGER,
+    balance: DataTypes.DECIMAL,
     isDelete: DataTypes.TINYINT
   }, {});
   user_balances.associate = function (models) {
