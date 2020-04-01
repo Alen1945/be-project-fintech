@@ -4,6 +4,9 @@ const createError = require('http-errors')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 
+// Routes
+const { RegisterUsers } = require('./src/controllers/users')
+
 App.use(morgan('tiny'))
 App.use(bodyParser.urlencoded({ extended: false }))
 App.use(bodyParser.json())
@@ -16,6 +19,7 @@ App.get('/', (req, res, next) => {
 /* API DOCS */
 App.use('/api-docs', require('./src/docs/'))
 
+App.post('/register', RegisterUsers)
 
 //Not Found
 App.use((req, res, next) => {
