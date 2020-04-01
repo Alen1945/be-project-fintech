@@ -188,7 +188,6 @@ exports.GetProfile = async (req, res, next) => {
         { model: Balance, attributes: ['balance'] },
         { model: Profile, attributes: ['fullname', 'email', 'gender', 'picture', 'address'] }]
     })
-    console.log(dataUser)
     if (!dataUser) {
       throw new Error('Your Account Has Not Exist Anymore')
     }
@@ -203,6 +202,43 @@ exports.GetProfile = async (req, res, next) => {
       }
     })
   } catch (e) {
+    res.status(202).send({
+      success: false,
+      msg: e.message
+    })
+  }
+}
+
+
+exports.TopUp = async (req, res, next) => {
+  try {
+    if (!req.body.nominal_topup) {
+      throw new Error('Please Entry nominal_topup')
+    }
+    if (req.body.nominal_topup <= 0) {
+      throw new Error('Nominal Top Up Must Positif Integer')
+    }
+    const dataUser = await Users.findOne({
+      where: { id: req.auth.id }, include: [
+        { model: Balance, attributes: ['balance'] },
+      ]
+    })
+    if (!dataUser) {
+      throw new Error('Your Account Has Not Exist Anymore')
+    }
+    const updateBalance = await Balance.update(
+      { balance: parseFloat(dataUser.user_balance.balance) + parseFloat(req.body.nominal_topup) },
+      { where: { id_user: req.auth.id } })
+    if (updateBalance[0]) {
+      res.send({
+        success: true,
+        msg: `Success TopUp for ${req.auth.username}`
+      })
+    } else {
+      throw new Error('Failed to TopUp!')
+    }
+  } catch (e) {
+    console.log(e)
     res.status(202).send({
       success: false,
       msg: e.message

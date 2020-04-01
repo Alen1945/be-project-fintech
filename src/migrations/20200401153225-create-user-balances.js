@@ -19,7 +19,7 @@ module.exports = {
         onDelete: 'CASCADE',
       },
       balance: {
-        type: Sequelize.INTEGER.UNSIGNED,
+        type: Sequelize.DECIMAL(10, 2).UNSIGNED,
         defaultValue: 0,
       },
       isDelete: {
