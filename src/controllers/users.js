@@ -108,3 +108,62 @@ exports.LoginUser = async (req, res, next) => {
     })
   }
 }
+
+
+exports.ForgotPassword = async (req, res, next) => {
+  try {
+    if (!req.query.code) {
+      if (!req.body.username) {
+        throw new Error('Please Defined Username to Create New Password')
+      }
+      const dataUser = await Users.findOne({ where: { username: req.body.username } })
+      if (!dataUser) {
+        throw new Error('Username Not Exists')
+      }
+      const updateCodeVerify = await Profile.update({ code_verify: await verifyCode() }, {
+        where: {
+          id_user: dataUser.get('id')
+        }
+      })
+      if (!updateCodeVerify[0]) {
+        throw new Error('Failed to Verify Your Account')
+      }
+      const dataProfile = await Profile.findOne({
+        where: {
+          id_user: dataUser.get('id')
+        }
+      })
+      await sendEmail(dataProfile.get('email'), dataProfile.get('code_verify'))
+      res.status(200).send({
+        success: true,
+        msg: `Request Success, Please Check Your email ${dataProfile.get('email')}, To get Code Verify `,
+      })
+    } else {
+      if (!req.body.new_password || !req.body.confirm_password) {
+        throw new Error('Please Defined new_password and confirm_password to update password')
+      }
+      if (req.body.new_password !== req.body.confirm_password) {
+        throw new Error('Confirm Password not Match')
+      }
+      const idUser = await Profile.findOne({ where: { code_verify: req.query.code }, attributes: ['id_user'] }).get('id_user')
+      const updatePassword = await Users.update({ password: bcrypt.hashSync(req.body.new_password) }, {
+        where: {
+          id: parseInt(idUser)
+        }
+      })
+      if (!updatePassword[0]) {
+        throw new Error('Failed To Change Password')
+      }
+      return res.status(200).send({
+        success: true,
+        msg: 'Success Change Password, Please Login'
+      })
+    }
+  } catch (e) {
+    console.log(e)
+    res.status(202).send({
+      success: false,
+      msg: e.message
+    })
+  }
+}
