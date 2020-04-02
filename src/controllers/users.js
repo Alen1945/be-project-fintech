@@ -9,6 +9,7 @@ const {
 } = require("../models");
 const verifyCode = require("../utility/generateCodeVerify");
 const sendEmail = require("../utility/sendEmail");
+const uploads = require("../middleware/uploadFiles");
 exports.RegisterUsers = async (req, res, next) => {
   try {
     const { username, password, email } = req.body;
@@ -261,6 +262,68 @@ exports.GetProfile = async (req, res, next) => {
   }
 };
 
+exports.UpdateUser = async (req, res, next) => {
+  try {
+    await uploads(req, res, "picture");
+    const { id } = req.auth;
+    const fillable = ["fullname", "email", "gender", "address", "picture"];
+    const params = Object.keys(req.body).reduce((dataUpdate, key) => {
+      console.log(dataUpdate);
+      if (key && fillable.includes(key) && req.body[key]) {
+        return { ...dataUpdate, [key]: req.body[key] };
+      } else {
+        return dataUpdate;
+      }
+    }, {});
+
+    if (req.file) {
+      params["picture"] = "uploads/" + req.file.filename;
+    }
+
+    if (req.body.old_password) {
+      const user = await Users.findOne({ where: { id } });
+      const oldPassword = user.password;
+      if (!(req.body.new_password && req.body.confirm_password)) {
+        throw new Error("New Password or Confirm Password Not Defined");
+      }
+      if (!(req.body.new_password === req.body.confirm_password)) {
+        throw new Error("Confirm Password Not Match");
+      }
+      if (!bcrypt.compareSync(req.body.old_password, oldPassword)) {
+        throw new Error("Old Password Not Match");
+      }
+      console.log("alen");
+      params["password"] = bcrypt.hashSync(req.body.new_password);
+    }
+    if (!params || !(Object.keys(params).length > 0)) {
+      throw new Error("Something Wrong with your sented data");
+    }
+    const updateProfile = await Profile.update(params, {
+      where: { id_user: id }
+    });
+    let updatePassword;
+    if (params.password) {
+      updatePassword = await Users.update(
+        { password: params.password },
+        { where: { id } }
+      );
+    }
+    if (updateProfile[0] || (updatePassword && updatePassword[0])) {
+      res.send({
+        success: true,
+        msg: `User ${req.auth.username} has been updated`
+      });
+    } else {
+      throw new Error("Failed to update user!");
+    }
+  } catch (e) {
+    console.log(e);
+    res.status(202).send({
+      success: false,
+      msg: e.message
+    });
+  }
+};
 exports.TopUp = async (req, res, next) => {
   try {
     if (!req.body.nominal_topup) {
