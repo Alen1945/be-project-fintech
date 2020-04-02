@@ -1,7 +1,7 @@
 /profile:
   get:
     tags:
-      - Profile
+      - Users
     summary: Get My Profile
     description: Use to Get Account Profile User currently logged in
     security:
@@ -21,7 +21,7 @@
         description: Internal Server Error
   patch:
     tags:
-      - Profile
+      - Users
     summary: Update Account Profile
     description: Minimal Defined one parameter to Update Account Profile
     security:
@@ -32,9 +32,17 @@
           schema:
             type: object
             properties:
-              username:
+              fullname:
                 type: string
-                examples: alen1945
+              email:
+                type: string
+              gender:
+                type: string
+              address:
+                type: string
+              picture:
+                type: string
+                format: binary
               old_password:
                 type: string
                 examples: mysecretpassword
@@ -44,35 +52,6 @@
               confirm_password:
                 type: string
                 examples: mysecretpassword
-              fullname:
-                type: string
-              email:
-                type: string
-              gender:
-                type: string
-              picture:
-                type: string
-                format: binary
-    responses:
-      200:
-        description: Success
-      202:
-        description: Request Accepted  but the processing has not been completed
-      400:
-        description: Error
-      401:
-        description: Not Authorized, Please Login
-      403:
-        description: Not Allow, Forbiden
-      500:
-        description: Internal Server Error
-  delete:
-    tags:
-      - Profile
-    summary: Delete Account Profile
-    description: Use To Delete Account User currently logged in
-    security:
-      - bearerAuth: []
     responses:
       200:
         description: Success
@@ -89,7 +68,7 @@
 /topup:
   post:
     tags:
-      - Profile
+      - Users
     summary: TopUp Balance
     description: TopUp Balance for User currently logged in
     security:
@@ -118,4 +97,3 @@
         description: Not Allow, Forbiden
       500:
         description: Internal Server Error
-  
