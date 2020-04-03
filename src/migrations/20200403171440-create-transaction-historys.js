@@ -1,24 +1,44 @@
-"use strict";
+'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable("topup_historys", {
+    return queryInterface.createTable('transaction_historys', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER(11)
       },
-      id_user: {
+      id_type_trasaction: {
         type: Sequelize.INTEGER(11),
         allowNull: false,
         references: {
-          model: "users",
-          key: "id"
+          model: 'type_transactions',
+          key: 'id'
         },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE"
+        onUpdate: 'CASCADE',
+        onDelete: 'NO ACTION',
       },
-      topup_balance: {
+      id_sender: {
+        type: Sequelize.INTEGER(11),
+        allowNull: false,
+        references: {
+          model: 'users',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'NO ACTION'
+      },
+      id_receiver: {
+        type: Sequelize.INTEGER(11),
+        defaultValue: 0,
+        references: {
+          model: 'users',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'NO ACTION'
+      },
+      amount: {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false
       },
@@ -39,6 +59,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable("topup_historys");
+    return queryInterface.dropTable('transaction_historys');
   }
 };

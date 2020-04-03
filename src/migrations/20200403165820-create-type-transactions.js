@@ -1,26 +1,15 @@
-"use strict";
+'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable("topup_historys", {
+    return queryInterface.createTable('type_transactions', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER(11)
       },
-      id_user: {
-        type: Sequelize.INTEGER(11),
-        allowNull: false,
-        references: {
-          model: "users",
-          key: "id"
-        },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE"
-      },
-      topup_balance: {
-        type: Sequelize.DECIMAL(10, 2),
-        allowNull: false
+      name: {
+        type: Sequelize.STRING(15)
       },
       isDelete: {
         type: Sequelize.TINYINT(1),
@@ -39,6 +28,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable("topup_historys");
+    return queryInterface.dropTable('type_transactions');
   }
 };
