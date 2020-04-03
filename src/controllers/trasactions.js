@@ -37,7 +37,7 @@ exports.CreateTransfer = async (req, res, next) => {
       WHERE id_user in (${dataSender.id}, ${dataReceiver.id})
     `, { type: models.Sequelize.QueryTypes.UPDATE })
     if (resultQueryUpdate[1] === 2) {
-      dataSender.createTransaction_history({
+      await dataSender.createTransaction_history({
         id_type_trasaction: 1,
         id_receiver: req.body.id_receiver,
         amount: parseFloat(req.body.amount)
