@@ -76,7 +76,7 @@
       - bearerAuth: []
     parameters:
       - name: id
-        in : path
+        in: path
         type: integer
         description: Specific id UserProfile
     responses:
@@ -141,6 +141,8 @@
               id_receiver:
                 type: string
               amount:
+                type: number
+              message:
                 type: string
     responses:
       200:
