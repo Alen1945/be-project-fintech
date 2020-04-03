@@ -5,7 +5,8 @@ const {
   users: Users,
   user_profiles: Profile,
   role_users: Role,
-  user_balances: Balance
+  user_balances: Balance,
+  topup_historys: TopupHistory
 } = require("../models");
 const verifyCode = require("../utility/generateCodeVerify");
 const sendEmail = require("../utility/sendEmail");
@@ -24,19 +25,16 @@ exports.RegisterUsers = async (req, res, next) => {
       throw new Error("Username Already Exists");
     }
     const hashPassword = bcrypt.hashSync(password);
-    const resultUsers = Users.build({ username, password: hashPassword });
-    const resultProfile = Profile.build({
-      email,
-      code_verify: await verifyCode()
+    const resultUsers = await Users.create({
+      username,
+      password: hashPassword
     });
-    const resultBalance = Balance.build();
-    await resultUsers.save();
-    await resultProfile.setUser(resultUsers);
-    await resultBalance.setUser(resultUsers);
-    await resultProfile.save();
-    await resultBalance.save();
-
-    if (resultProfile) {
+    if (resultUsers) {
+      const resultProfile = await resultUsers.createUser_profile({
+        email,
+        code_verify: await verifyCode()
+      });
+      await resultUsers.createUser_balance();
       await sendEmail(email, resultProfile.get("code_verify"));
       res.status(201).send({
         success: true,
@@ -348,6 +346,9 @@ exports.TopUp = async (req, res, next) => {
       { where: { id_user: req.auth.id } }
     );
     if (updateBalance[0]) {
+      dataUser.createTopup_history({
+        topup_balance: parseFloat(req.body.nominal_topup)
+      });
       res.send({
         success: true,
         msg: `Success TopUp for ${req.auth.username}`
