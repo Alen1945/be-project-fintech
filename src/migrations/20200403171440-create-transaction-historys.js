@@ -1,14 +1,24 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('user_balances', {
+    return queryInterface.createTable('transaction_historys', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER(11)
       },
-      id_user: {
+      id_type_trasaction: {
+        type: Sequelize.INTEGER(11),
+        allowNull: false,
+        references: {
+          model: 'type_transactions',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'NO ACTION',
+      },
+      id_sender: {
         type: Sequelize.INTEGER(11),
         allowNull: false,
         references: {
@@ -16,11 +26,21 @@ module.exports = {
           key: 'id'
         },
         onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        onDelete: 'NO ACTION'
       },
-      balance: {
-        type: Sequelize.DECIMAL(10, 2).UNSIGNED,
+      id_receiver: {
+        type: Sequelize.INTEGER(11),
         defaultValue: 0,
+        references: {
+          model: 'users',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'NO ACTION'
+      },
+      amount: {
+        type: Sequelize.DECIMAL(10, 2),
+        allowNull: false
       },
       isDelete: {
         type: Sequelize.TINYINT(1),
@@ -39,6 +59,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('user_balances');
+    return queryInterface.dropTable('transaction_historys');
   }
 };

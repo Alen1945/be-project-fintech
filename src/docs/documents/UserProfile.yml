@@ -65,6 +65,29 @@
         description: Not Allow, Forbiden
       500:
         description: Internal Server Error
+
+/users/{id}:
+  get:
+    tags:
+      - Users
+    summary: Get Specific UserProfile
+    description: Use to Get UserProfile In App
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in : path
+        type: integer
+        description: Specific id UserProfile
+    responses:
+      200:
+        description: Success
+      202:
+        description: Request Accepted  but the processing has not been completed
+      400:
+        description: Error
+      500:
+        description: Internal Server Error
 /topup:
   post:
     tags:
@@ -95,5 +118,36 @@
         description: Not Authorized, Please Login
       403:
         description: Not Allow, Forbiden
+      500:
+        description: Internal Server Error
+/transfer:
+  post:
+    tags:
+      - Users
+    summary: Transfer
+    description: Transfer
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            require:
+              - id_receiver
+              - amount
+            properties:
+              id_receiver:
+                type: string
+              amount:
+                type: string
+    responses:
+      200:
+        description: Success
+      202:
+        description: Request Accepted  but the processing has not been completed
+      400:
+        description: Error
       500:
         description: Internal Server Error
