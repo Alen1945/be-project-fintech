@@ -66,6 +66,41 @@
       500:
         description: Internal Server Error
 
+/users:
+  get:
+    tags:
+      - Users
+    summary: Browse All Users
+    description: Use Browse All Users
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: limit
+        in : query
+        type: integer
+        description: Numbers of Data PerPage
+      - name: page
+        in : query
+        type: integer
+        description: Page Number
+      - name: search
+        in : query
+        type: string
+        description: Search Username
+    responses:
+      200:
+        description: Success
+      202:
+        description: Request Accepted  but the processing has not been completed
+      400:
+        description: Error
+      401:
+        description: Not Authorized, Please Login
+      403:
+        description: Not Allow, Forbiden
+      500:
+        description: Internal Server Error
+
 /users/{id}:
   get:
     tags:
