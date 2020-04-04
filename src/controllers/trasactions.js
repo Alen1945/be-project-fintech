@@ -6,7 +6,7 @@ const {
   topup_historys: TopupHistory,
   transaction_historys: TransactionHistory,
 } = require("../models");
-
+const getPagination = require('../utility/getPagination')
 exports.CreateTransfer = async (req, res, next) => {
   try {
     if (!req.body.id_receiver || !req.body.amount) {
@@ -81,27 +81,11 @@ exports.GetAllHistoryTopup = async (req, res, next) => {
       limit: params.perPage,
       offset: (parseInt(params.perPage) * (parseInt(params.currentPage) - 1)),
     })
-    console.log(req)
-    const totalPages = Math.ceil(dataHistory.count / parseInt(params.perPage))
-    const query = req.query
-    query.page = parseInt(params.currentPage) + 1
-    const nextPage = (parseInt(params.currentPage) < totalPages ? process.env.APP_URL.concat(`${req.route.path}?page=${query.page}&limit=${params.perPage}`) : null)
-    query.page = parseInt(params.currentPage) - 1
-    const previousPage = (parseInt(params.currentPage) > 1 ? process.env.APP_URL.concat(`${req.route.path}?page=${query.page}&limit=${params.perPage}`) : null)
-
-    const pagination = {
-      currentPage: params.currentPage,
-      nextPage,
-      previousPage,
-      totalPages,
-      perPage: params.perPage,
-      totalEntries: dataHistory.count
-    }
     if (dataHistory.rows.length > 0) {
       res.status(200).send({
         success: true,
         data: dataHistory.rows,
-        pagination
+        pagination: getPagination(req, params, dataHistory.count)
       })
     } else {
       res.status(200).send({
