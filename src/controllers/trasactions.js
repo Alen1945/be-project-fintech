@@ -1,7 +1,9 @@
+require('dotenv').config()
 const models = require("../models");
 const {
   users: Users,
   user_balances: Balance,
+  topup_historys: TopupHistory,
   transaction_historys: TransactionHistory,
 } = require("../models");
 
@@ -34,12 +36,12 @@ exports.CreateTransfer = async (req, res, next) => {
       UPDATE user_balances SET balance = 
       CASE id_user
         WHEN ${dataSender.id} THEN ${
-        parseFloat(dataSender.user_balance.balance) -
-        parseFloat(req.body.amount)
+      parseFloat(dataSender.user_balance.balance) -
+      parseFloat(req.body.amount)
       }
         WHEN ${dataReceiver.id} THEN ${
-        parseFloat(dataReceiver.user_balance.balance) +
-        parseFloat(req.body.amount)
+      parseFloat(dataReceiver.user_balance.balance) +
+      parseFloat(req.body.amount)
       } 
       END
       WHERE id_user in (${dataSender.id}, ${dataReceiver.id})
@@ -68,3 +70,51 @@ exports.CreateTransfer = async (req, res, next) => {
     });
   }
 };
+
+exports.GetAllHistoryTopup = async (req, res, next) => {
+  try {
+    const params = {
+      currentPage: parseInt(req.query.page) || 1,
+      perPage: parseInt(req.query.limit) || 10,
+    }
+    const dataHistory = await TopupHistory.findAndCountAll({
+      limit: params.perPage,
+      offset: (parseInt(params.perPage) * (parseInt(params.currentPage) - 1)),
+    })
+    console.log(req)
+    const totalPages = Math.ceil(dataHistory.count / parseInt(params.perPage))
+    const query = req.query
+    query.page = parseInt(params.currentPage) + 1
+    const nextPage = (parseInt(params.currentPage) < totalPages ? process.env.APP_URL.concat(`${req.route.path}?page=${query.page}&limit=${params.perPage}`) : null)
+    query.page = parseInt(params.currentPage) - 1
+    const previousPage = (parseInt(params.currentPage) > 1 ? process.env.APP_URL.concat(`${req.route.path}?page=${query.page}&limit=${params.perPage}`) : null)
+
+    const pagination = {
+      currentPage: params.currentPage,
+      nextPage,
+      previousPage,
+      totalPages,
+      perPage: params.perPage,
+      totalEntries: dataHistory.count
+    }
+    if (dataHistory.rows.length > 0) {
+      res.status(200).send({
+        success: true,
+        data: dataHistory.rows,
+        pagination
+      })
+    } else {
+      res.status(200).send({
+        success: true,
+        data: false,
+        msg: 'Data is Empty'
+      })
+    }
+  } catch (err) {
+    console.log(err)
+    res.status(202).send({
+      success: false,
+      msg: e.message
+    })
+  }
+}
