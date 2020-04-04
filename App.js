@@ -16,7 +16,8 @@ const {
   TopUp
 } = require("./src/controllers/users");
 
-const { CreateTransfer } = require('./src/controllers/trasactions')
+const UserRouter = require('./src/routes/users')
+const { CreateTransfer, GetAllHistoryTopup } = require('./src/controllers/trasactions')
 /* Auth Middleware */
 const autMiddleware = require("./src/middleware/authMiddleware");
 
@@ -46,7 +47,8 @@ App.patch("/profile", autMiddleware, UpdateUser);
 App.post("/topup", autMiddleware, TopUp);
 
 App.post("/transfer", autMiddleware, CreateTransfer)
-App.get("/users/:id", autMiddleware, GetProfile);
+App.get("/history-topup", autMiddleware, GetAllHistoryTopup)
+App.use("/users", UserRouter);
 //Not Found
 App.use((req, res, next) => {
   next(createError(404));

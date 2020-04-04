@@ -120,6 +120,36 @@
         description: Not Allow, Forbiden
       500:
         description: Internal Server Error
+/history-topup:
+  get:
+    tags:
+      - Users
+    summary: Browse All History Topup
+    description: Use Browse All History Topup
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: limit
+        in : query
+        type: integer
+        description: Numbers of Data PerPage
+      - name: page
+        in : query
+        type: integer
+        description: Page Number
+    responses:
+      200:
+        description: Success
+      202:
+        description: Request Accepted  but the processing has not been completed
+      400:
+        description: Error
+      401:
+        description: Not Authorized, Please Login
+      403:
+        description: Not Allow, Forbiden
+      500:
+        description: Internal Server Error
 /transfer:
   post:
     tags:
