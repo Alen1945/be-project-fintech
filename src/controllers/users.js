@@ -1,6 +1,8 @@
+require('dotenv').config()
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
+const models = require('../models');
 const {
   users: Users,
   user_profiles: Profile,
@@ -11,6 +13,7 @@ const {
 const verifyCode = require('../utility/generateCodeVerify');
 const sendEmail = require('../utility/sendEmail');
 const uploads = require('../middleware/uploadFiles');
+const getPagination = require('../utility/getPagination')
 exports.RegisterUsers = async (req, res, next) => {
   try {
     const { username, password, email } = req.body;
@@ -365,3 +368,52 @@ exports.TopUp = async (req, res, next) => {
     });
   }
 };
+
+
+exports.GetAllUsers = async (req, res, next) => {
+  try {
+    const params = {
+      currentPage: parseInt(req.query.page) || 1,
+      perPage: parseInt(req.query.limit) || 10,
+      search: req.query.search || ''
+    }
+    const dataUsers = await Users.findAndCountAll({
+      where: {
+        username: { [models.Sequelize.Op.like]: `%${params.search}%` }
+      },
+      limit: params.perPage,
+      offset: (parseInt(params.perPage) * (parseInt(params.currentPage) - 1)),
+      include: [
+        { model: Balance, attributes: ['balance'] },
+        {
+          model: Profile,
+          attributes: ['picture']
+        }
+      ]
+    })
+
+    if (dataUsers.rows.length > 0) {
+      res.status(200).send({
+        success: true,
+        data: dataUsers.rows.map(data => ({
+          id: data.id, username: data.username,
+          balance: data.user_balance.balance,
+          ...data.user_profile.dataValues
+        })),
+        pagination: getPagination(req, params, dataUsers.count)
+      })
+    } else {
+      res.status(200).send({
+        success: true,
+        data: false,
+        msg: 'Data is Empty'
+      })
+    }
+  } catch (err) {
+    console.log(err)
+    res.status(202).send({
+      success: false,
+      msg: e.message
+    })
+  }
+}
