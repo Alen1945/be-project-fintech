@@ -78,8 +78,12 @@ exports.GetAllHistoryTopup = async (req, res, next) => {
       perPage: parseInt(req.query.limit) || 10,
     }
     const dataHistory = await TopupHistory.findAndCountAll({
+      where: { id_user: req.auth.id },
       limit: params.perPage,
       offset: (parseInt(params.perPage) * (parseInt(params.currentPage) - 1)),
+      order: [
+        ['createdAt', 'DESC']
+      ]
     })
     if (dataHistory.rows.length > 0) {
       res.status(200).send({
