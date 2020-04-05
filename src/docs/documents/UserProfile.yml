@@ -218,3 +218,33 @@
         description: Error
       500:
         description: Internal Server Error
+/history-transaction:
+  get:
+    tags:
+      - Users
+    summary: Browse All History Transaction
+    description: Use Browse All History Transaction
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: limit
+        in : query
+        type: integer
+        description: Numbers of Data PerPage
+      - name: page
+        in : query
+        type: integer
+        description: Page Number
+    responses:
+      200:
+        description: Success
+      202:
+        description: Request Accepted  but the processing has not been completed
+      400:
+        description: Error
+      401:
+        description: Not Authorized, Please Login
+      403:
+        description: Not Allow, Forbiden
+      500:
+        description: Internal Server Error

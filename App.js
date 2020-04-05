@@ -17,7 +17,7 @@ const {
 } = require("./src/controllers/users");
 
 const UserRouter = require('./src/routes/users')
-const { CreateTransfer, GetAllHistoryTopup } = require('./src/controllers/trasactions')
+const { CreateTransfer, GetAllHistoryTopup, GetAllHistoryTransaction } = require('./src/controllers/transactions')
 /* Auth Middleware */
 const autMiddleware = require("./src/middleware/authMiddleware");
 
@@ -45,9 +45,10 @@ App.post("/change-password", ForgotPassword);
 App.get("/profile", autMiddleware, GetProfile);
 App.patch("/profile", autMiddleware, UpdateUser);
 App.post("/topup", autMiddleware, TopUp);
+App.get("/history-topup", autMiddleware, GetAllHistoryTopup)
 
 App.post("/transfer", autMiddleware, CreateTransfer)
-App.get("/history-topup", autMiddleware, GetAllHistoryTopup)
+App.get("/history-transaction", autMiddleware, GetAllHistoryTransaction)
 App.use("/users", UserRouter);
 //Not Found
 App.use((req, res, next) => {

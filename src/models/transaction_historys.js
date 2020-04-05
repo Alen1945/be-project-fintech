@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
   const transaction_historys = sequelize.define(
     "transaction_historys",
     {
-      id_type_trasaction: DataTypes.INTEGER,
+      id_type_transaction: DataTypes.INTEGER,
       id_sender: DataTypes.INTEGER,
       id_receiver: DataTypes.INTEGER,
       amount: DataTypes.DECIMAL,
@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
   );
   transaction_historys.associate = function (models) {
     transaction_historys.belongsTo(models.type_transactions, {
-      foreignKey: "id_type_trasaction",
+      foreignKey: "id_type_transaction",
       targetKey: "id",
     });
     transaction_historys.belongsTo(models.users, {
