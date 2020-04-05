@@ -8,7 +8,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER(11),
       },
-      id_type_trasaction: {
+      id_type_transaction: {
         type: Sequelize.INTEGER(11),
         allowNull: false,
         references: {
