@@ -2,8 +2,10 @@ require('dotenv').config()
 const models = require("../models");
 const {
   users: Users,
+  user_profiles: Profile,
   user_balances: Balance,
   topup_historys: TopupHistory,
+  type_transactions: TypeTransactions,
   transaction_historys: TransactionHistory,
 } = require("../models");
 const getPagination = require('../utility/getPagination')
@@ -50,7 +52,7 @@ exports.CreateTransfer = async (req, res, next) => {
     );
     if (resultQueryUpdate[1] === 2) {
       await dataSender.createTransaction_history({
-        id_type_trasaction: 1,
+        id_type_transaction: 1,
         id_receiver: req.body.id_receiver,
         amount: parseFloat(req.body.amount),
         message: req.body.message || "",
@@ -89,6 +91,87 @@ exports.GetAllHistoryTopup = async (req, res, next) => {
       res.status(200).send({
         success: true,
         data: dataHistory.rows,
+        pagination: getPagination(req, params, dataHistory.count)
+      })
+    } else {
+      res.status(200).send({
+        success: true,
+        data: false,
+        msg: 'Data is Empty'
+      })
+    }
+  } catch (err) {
+    console.log(err)
+    res.status(202).send({
+      success: false,
+      msg: e.message
+    })
+  }
+}
+
+exports.GetAllHistoryTransaction = async (req, res, next) => {
+  try {
+    const params = {
+      currentPage: parseInt(req.query.page) || 1,
+      perPage: parseInt(req.query.limit) || 10,
+    }
+    const dataHistory = await TransactionHistory.findAndCountAll({
+      where: {
+        [models.Sequelize.Op.or]: [
+          { id_sender: req.auth.id },
+          { id_receiver: req.auth.id }
+        ]
+      },
+      limit: params.perPage,
+      offset: (parseInt(params.perPage) * (parseInt(params.currentPage) - 1)),
+      order: [
+        ['createdAt', 'DESC']
+      ],
+      include: [{ model: TypeTransactions, attributes: ['name'] }, { model: Users, attributes: ['username'], include: [{ model: Profile, attributes: ['picture'] }] }],
+    })
+    if (dataHistory.rows.length > 0) {
+      res.status(200).send({
+        success: true,
+        data: dataHistory.rows.map(data => {
+          if (data.type_transaction.name = 'transfer') {
+            if (data.id_sender === req.auth.id) {
+              return {
+                id: data.id,
+                id_type_transaction: data.id_type_transaction,
+                id_sender: data.id_sender,
+                id_receiver: data.id_receiver,
+                amount: data.amount,
+                message: data.amount,
+                receiverName: data.user.username,
+                receiverPicture: data.user.user_profile.dataValues.picture,
+                type_transaction: 'Outgoing Transfer',
+                createdAt: data.createdAt,
+              }
+            } else {
+              return {
+                id: data.id,
+                id_type_transaction: data.id_type_transaction,
+                id_sender: data.id_sender,
+                id_receiver: data.id_receiver,
+                amount: data.amount,
+                message: data.amount,
+                senderName: data.user.username,
+                senderPicture: data.user.user_profile.dataValues.picture,
+                type_transaction: 'Incoming Transfer',
+                createdAt: data.createdAt,
+              }
+            }
+          } else {
+            return {
+              id: data.id,
+              id_type_transaction: data.id_type_transaction,
+              type_transaction: data.type_transaction.name,
+              id_sender: data.id_sender,
+              amount: data.amount,
+              createdAt: data.createdAt,
+            }
+          }
+        }),
         pagination: getPagination(req, params, dataHistory.count)
       })
     } else {
