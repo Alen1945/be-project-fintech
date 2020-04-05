@@ -127,7 +127,12 @@ exports.GetAllHistoryTransaction = async (req, res, next) => {
       order: [
         ['createdAt', 'DESC']
       ],
-      include: [{ model: TypeTransactions, attributes: ['name'] }, { model: Users, attributes: ['username'], include: [{ model: Profile, attributes: ['picture'] }] }],
+      include: [
+        { model: TypeTransactions, attributes: ['name'] },
+        { model: Users, as: 'sender', attributes: ['username'], include: [{ model: Profile, attributes: ['picture'] }] },
+        { model: Users, as: 'receiver', attributes: ['username'], include: [{ model: Profile, attributes: ['picture'] }] }
+      ],
+
     })
     if (dataHistory.rows.length > 0) {
       res.status(200).send({
@@ -142,8 +147,8 @@ exports.GetAllHistoryTransaction = async (req, res, next) => {
                 id_receiver: data.id_receiver,
                 amount: data.amount,
                 message: data.message,
-                receiverName: data.user.username,
-                receiverPicture: data.user.user_profile.dataValues.picture,
+                receiverName: data.receiver.username,
+                receiverPicture: data.receiver.user_profile.dataValues.picture,
                 type_transaction: 'Outgoing Transfer',
                 createdAt: data.createdAt,
               }
@@ -155,8 +160,8 @@ exports.GetAllHistoryTransaction = async (req, res, next) => {
                 id_receiver: data.id_receiver,
                 amount: data.amount,
                 message: data.message,
-                senderName: data.user.username,
-                senderPicture: data.user.user_profile.dataValues.picture,
+                senderName: data.sender.username,
+                senderPicture: data.sender.user_profile.dataValues.picture,
                 type_transaction: 'Incoming Transfer',
                 createdAt: data.createdAt,
               }

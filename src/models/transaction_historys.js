@@ -18,10 +18,12 @@ module.exports = (sequelize, DataTypes) => {
       targetKey: "id",
     });
     transaction_historys.belongsTo(models.users, {
+      as: 'sender',
       foreignKey: "id_sender",
       targetKey: "id",
     });
     transaction_historys.belongsTo(models.users, {
+      as: 'receiver',
       foreignKey: "id_receiver",
       targetKey: "id",
     });
